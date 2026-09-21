@@ -1,0 +1,9 @@
+import env from 'dotenv'
+env.config()
+import jwt from 'jsonwebtoken'
+
+function generateAuthToken(payload) {
+    return jwt.sign(payload, process.env.JWT_SECRET);
+}
+
+export {generateAuthToken}
