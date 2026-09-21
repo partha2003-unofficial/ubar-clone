@@ -1,12 +1,13 @@
-# User Registration Endpoint
+# User Authentication Endpoints
+
+- [POST /user/register](#post-userregister)
+- [POST /user/login](#post-userlogin)
+
+---
 
 ## `POST /user/register`
 
 Registers a new user in the system. Validates input, hashes the password, creates the user document in MongoDB, and returns a JWT auth token along with the created user.
-
-> **Note:** The exact path depends on how the router is mounted in your main app file (e.g. `app.use('/user', userRoutes)` combined with `router.post('/', ...)` in the route file would produce `/user/register` only if the router itself is mounted at `/user/register`, or the child route is `/register` instead of `/`). Adjust the path below to match your actual mounting.
-
----
 
 ## Description
 
@@ -76,9 +77,6 @@ Returned when the user is successfully created.
   }
 }
 ```
-
-> ⚠️ **Security note:** The response currently includes the hashed password inside `createUser`. It's recommended to exclude the `password` field from the response (e.g. using `.select('-password')` or deleting it before sending) to avoid leaking password hashes to the client.
-
 ---
 
 ### ❌ 400 Bad Request
@@ -111,9 +109,6 @@ Returned when an unexpected error occurs during user creation (e.g. duplicate em
   "error": {}
 }
 ```
-
-> ⚠️ **Note:** If `fullName`, `email`, or `password` are missing from the body, the controller currently `throw`s an error outside the `try/catch` block. Since there is no surrounding error handler shown, this will likely crash the request (or be caught by an Express global error handler if one exists) rather than returning a clean `400` response. Consider moving this check inside the `try` block or returning a `400` response directly instead of throwing.
-
 ---
 
 ## Field Validation Summary
@@ -135,3 +130,68 @@ Returned when an unexpected error occurs during user creation (e.g. duplicate em
 - Add route-level validation for `fullName.lastName` if it should be required or length-checked before hitting the database.
 - Exclude `password` from the `createUser` object in the success response.
 - Move the "required fields" check inside the `try/catch` block, or replace `throw new Error(...)` with `return response.status(400).json({ message: "enter all required fields" })`.
+
+---
+
+## `POST /user/login`
+
+Authenticates an existing user by email and password, and returns a JWT auth token along with the user object.
+
+### Description
+
+This endpoint logs in a user. It performs the following steps:
+
+1. Validates the incoming request body using `express-validator` rules defined on the route.
+2. Checks that `email` and `password` are present in the request body.
+3. Looks up the user by `email` in the database.
+4. Compares the provided password against the stored hashed password using `bcrypt`.
+5. Generates a JWT authentication token for the matched user.
+6. Returns the token and the user object.
+
+### Request
+
+#### Headers
+
+| Header         | Value              | Required |
+|----------------|--------------------|----------|
+| Content-Type   | `application/json` | Yes      |
+
+#### Body Parameters
+
+| Field      | Type   | Required | Validation Rules                    |
+|------------|--------|----------|---------------------------------------|
+| `email`    | String | Yes      | Must be a valid email format          |
+| `password` | String | Yes      | Minimum 6 characters                  |
+
+#### Example Request Body
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securePass123"
+}
+```
+
+### Responses
+
+#### ✅ 200 ok
+
+Returned when login succeeds.
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userFind": {
+    "_id": "652f1b2e8a1c2d3e4f5a6b7c",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "password": "$2b$10$hashedPasswordString...",
+    "createdAt": "2026-09-22T10:00:00.000Z",
+    "updatedAt": "2026-09-22T10:00:00.000Z",
+    "__v": 0
+  }
+}
+```

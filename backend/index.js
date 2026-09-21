@@ -13,6 +13,6 @@ application.use(express.urlencoded({ extended: true }));
 application.use(cors())
 application.use(express.json());
 
-application.use('/user/register', userRoute)
+application.use('/user', userRoute)
 
 export default application;
