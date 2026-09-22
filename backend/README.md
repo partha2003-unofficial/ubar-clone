@@ -2,12 +2,16 @@
 
 - [POST /user/register](#post-userregister)
 - [POST /user/login](#post-userlogin)
+- [GET /user/userProfile](#get-useruserprofile)
+- [GET /user/logout](#get-userlogout)
 
 ---
 
 ## `POST /user/register`
 
 Registers a new user in the system. Validates input, hashes the password, creates the user document in MongoDB, and returns a JWT auth token along with the created user.
+
+---
 
 ## Description
 
@@ -123,14 +127,6 @@ Returned when an unexpected error occurs during user creation (e.g. duplicate em
 | `password`             | Schema (Mongoose)     | Required, minimum 6 characters (not validated at route level) |
 
 ---
-
-## Notes for Improvement
-
-- Add route-level validation for `password` (e.g. `body('password').isLength({ min: 6 })`) since it's currently only enforced at the schema level, which produces a less user-friendly Mongoose validation error rather than a clean `400` response.
-- Add route-level validation for `fullName.lastName` if it should be required or length-checked before hitting the database.
-- Exclude `password` from the `createUser` object in the success response.
-- Move the "required fields" check inside the `try/catch` block, or replace `throw new Error(...)` with `return response.status(400).json({ message: "enter all required fields" })`.
-
 ---
 
 ## `POST /user/login`
@@ -174,9 +170,9 @@ This endpoint logs in a user. It performs the following steps:
 
 ### Responses
 
-#### ✅ 200 ok
+#### ✅ 200 OK
 
-Returned when login succeeds.
+Returned when login succeeds. The JWT is also set as a `token` cookie on the response (via `response.cookie('token', token)`), in addition to being returned in the JSON body.
 
 ```json
 {
@@ -194,4 +190,156 @@ Returned when login succeeds.
     "__v": 0
   }
 }
+```
+
+**Response Cookie**
+
+| Cookie  | Value        | Notes                                    |
+|---------|--------------|-------------------------------------------|
+| `token` | JWT auth token | Set via `response.cookie('token', token)`; no `httpOnly`, `secure`, or `sameSite` options are currently set. |
+
+#### ❌ 400 Bad Request
+
+Intended to be returned when validation fails, required fields are missing, or the email/password combination is invalid:
+
+```json
+{ "message": "all fields are required" }
+```
+```json
+{ "message": "enter a email and password" }
+```
+```json
+{ "message": "invalid email and password" }
+```
+
+#### ❌ 500 Internal Server Error
+
+Returned when an unexpected error occurs inside the `try` block — including the "user not found" case described below.
+
+```json
+{ "message": "internal server error", "error": {} }
+```
+## Authentication
+
+Both endpoints below are protected by `authMiddleware`. Requests must supply a valid JWT, either as a `token` cookie or as a Bearer token in the `Authorization` header.
+
+| Header / Cookie          | Value                          | Required |
+|---------------------------|---------------------------------|----------|
+| `Cookie: token`            | JWT issued by register/login    | One of these two |
+| `Authorization`            | `Bearer <JWT>`                  | One of these two |
+
+`authMiddleware` verifies the token, checks it against a token blacklist (used for logout), and attaches the matched user document to `request.user` before calling `next()`.
+
+---
+
+## `GET /user/userProfile`
+
+Returns the profile of the currently authenticated user.
+
+### Description
+
+1. `authMiddleware` verifies the JWT and attaches the authenticated user to `request.user`.
+2. The controller returns that user object in the response.
+
+### Request
+
+| Header / Cookie          | Value                | Required |
+|---------------------------|-----------------------|----------|
+| `Cookie: token` or `Authorization: Bearer <JWT>` | Valid JWT | Yes |
+
+No request body.
+
+### Responses
+
+#### ✅ 200 OK
+
+```json
+{
+  "user": {
+    "_id": "652f1b2e8a1c2d3e4f5a6b7c",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "createdAt": "2026-09-22T10:00:00.000Z",
+    "updatedAt": "2026-09-22T10:00:00.000Z",
+    "__v": 0
+  }
+}
+```
+
+#### ❌ 404 Not Found
+
+Returned by `authMiddleware` when no token is supplied, or when token verification fails.
+
+```json
+{ "message": "token is not found!" }
+```
+```json
+{ "message": "unauthorized user", "error": {} }
+```
+
+#### ❌ 401 Unauthorized
+
+Returned by `authMiddleware` when the supplied token is on the blacklist (i.e. the user already logged out).
+
+```json
+{ "message": "user unauthorized" }
+```
+
+---
+
+## `GET /user/logout`
+
+Logs the authenticated user out by clearing the auth cookie and blacklisting the token so it can no longer be used.
+
+### Description
+
+1. `authMiddleware` verifies the JWT and attaches the authenticated user to `request.user`.
+2. The controller clears the `token` cookie.
+3. The token (from the cookie or the `Authorization` header) is added to the blacklist collection.
+4. A success message is returned.
+
+### Request
+
+| Header / Cookie          | Value                | Required |
+|---------------------------|-----------------------|----------|
+| `Cookie: token` or `Authorization: Bearer <JWT>` | Valid JWT | Yes |
+
+No request body.
+
+### Responses
+
+#### ✅ 200 OK
+
+```json
+{ "message": "user logout is successful" }
+```
+
+#### ❌ 404 Not Found
+
+Returned by `authMiddleware` when no token is supplied, or when token verification fails.
+
+```json
+{ "message": "token is not found!" }
+```
+```json
+{ "message": "unauthorized user", "error": {} }
+```
+
+#### ❌ 401 Unauthorized
+
+Returned by `authMiddleware` when the supplied token is already blacklisted.
+
+```json
+{ "message": "user unauthorized" }
+```
+
+#### ❌ 500 Internal Server Error
+
+Returned if blacklisting the token fails.
+
+```json
+{ "message": "internal server error", "error": {} }
 ```
