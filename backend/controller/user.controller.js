@@ -12,15 +12,22 @@ async function createUser(request, response) {
     try {
         const { fullName, email, password } = request.body;
         if (!fullName || !email || !password) {
-            throw new Error("enter all required fields");
+            response.status(404).json({ message: 'all required field are reqiured' })
         }
+
+        const isUserAlreadyExist = await userModel.find({ email });
+        if (isUserAlreadyExist) { return response.status(400).json({ message: 'user is already exist' }) }
+
         const hashedPassword = await userModel.createHashPassword(password);
+        if (!hashedPassword) { return response.status(400).json({ message: 'password is not hashed' }) }
+        
         const createUser = await userModel.create({
             fullName: { firstName: fullName.firstName, lastName: fullName.lastName },
             email,
             password: hashedPassword
         })
 
+        createUser.password = undefined; // for hidding password
         const token = createUser.generateAuthToken()
         response.status(201).json({ token, createUser })
 
@@ -62,7 +69,7 @@ async function userLogout(request, response) {
         response.clearCookie('token');
         const token = request.cookies?.token || request.headers.authorization?.split(' ')[1];
         if (token) { await blacklistUserModel.create({ token }) }
-        response.status(200).json({ message: 'user logout is successful' })
+        response.status(200).json({ message: ' logout  successful' })
     } catch (error) {
         response.status(500).json({ message: 'internal server error', error: error })
     }

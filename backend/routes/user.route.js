@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { body } from 'express-validator';
 import { createUser, loginUser, userLogout, userProfile } from '../controller/user.controller.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware_user } from '../middleware/auth.middleware.js';
 const router = Router();
 
 router.post('/register', [
@@ -14,7 +14,7 @@ router.post('/login', [
     body('password').isLength({ min: 6 }).withMessage('enter a minimum length of 6 character of name')
 ], loginUser)
 
-router.get('/userProfile', authMiddleware, userProfile)
-router.get('/logout', authMiddleware, userLogout)
+router.get('/userProfile', authMiddleware_user, userProfile)
+router.get('/logout', authMiddleware_user, userLogout)
 
 export default router;
