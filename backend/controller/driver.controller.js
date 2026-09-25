@@ -6,11 +6,11 @@ async function registerDriver(request, response) {
     if (!errorValidation.isEmpty()) { return response.status(400).json({ message: 'enter valid required field', error: errorValidation.array() }) }
 
     try {
-        const { fullName, email, password, status, vehical, location } = request.body;
-        if (!fullName.firstName || !email || !password || !status || !vehical || !location) {
+        const { fullName, email, password, vehical} = request.body;
+        if (!fullName.firstName || !email || !password || !vehical) {
             return response.status(400).json({ message: 'enter valid required fields' })
         }
-        // console.log(request.body)
+        console.log(request.body)
         const isAllreadyExistDriver = await driverModel.findOne({ email });
         if (isAllreadyExistDriver) { return response.status(400).json({ message: 'unauthorized user || driver already exist' }) };
 
@@ -21,21 +21,19 @@ async function registerDriver(request, response) {
             fullName: { firstName: fullName.firstName, lastName: fullName.lastName },
             email,
             password: createHashPassword,
-            status,
             vehical: {
                 color: vehical.color,
                 NumberPlate: vehical.NumberPlate,
                 capacity: vehical.capacity,
                 vehicalType: vehical.vehicalType
-            },
-            location
+            }
         })
 
         createDriver.password = undefined;
         const token = createDriver.createAuthToken()
-        return response.status(200).json({ token, createDriver })
+        return response.status(201).json({ token, createDriver })
     } catch (error) {
-        response.status(500).json({ message: 'inernal server error in register', error: error })
+        return response.status(500).json({ message: 'inernal server error in register', error: error })
     }
 }
 
@@ -54,7 +52,7 @@ async function loginDriver(request, response) {
         findDriver.password = undefined;
         const token = findDriver.createAuthToken();
         response.cookie('token', token);
-        return response.status(200).json({ message:'login successful',token, findDriver })
+        return response.status(200).json({ message: 'login successful', token, findDriver })
 
     } catch (error) {
         response.status(500).json({ message: 'internal server error' })

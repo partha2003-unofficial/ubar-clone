@@ -1,31 +1,69 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { useContext, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { DriverDataContext } from '../../context/driverContext'
 
 const inputClass =
   'bg-[#eeeeee] rounded-2xl px-4 py-3 w-full text-base placeholder:text-neutral-500 outline-none ring-2 ring-transparent focus:ring-black transition-shadow'
 const labelClass = 'block text-base font-medium mb-2'
 
 const DriverSignUp = () => {
+
+  // account details
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [driverData, setDriverData] = useState({})
 
-  function handleSubmit(e) {
+  // vehicle details -> maps to the schema's `vehical` object
+  const [vehicleColor, setVehicleColor] = useState('')
+  const [vehicleNumberPlate, setVehicleNumberPlate] = useState('')
+  const [vehicleCapacity, setVehicleCapacity] = useState('')
+  const [vehicleType, setVehicleType] = useState('car')
+
+  const navigate = useNavigate()
+
+  const { setDriver } = useContext(DriverDataContext)
+
+  async function handleSubmit(e) {
     e.preventDefault()
-    setDriverData({
+
+    const driverData = ({
       fullName: {
         firstName: firstName,
         lastName: lastName
       },
       email: email,
-      password: password
+      password: password,
+      vehical: {
+        color: vehicleColor,
+        NumberPlate: vehicleNumberPlate,
+        capacity: Number(vehicleCapacity),
+        vehicalType: vehicleType
+      }
     })
+
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/driver/register`, driverData)
+      .then((response) => {
+        if (response.status === 201) {
+          localStorage.setItem('token', response.data.token)
+          setDriver(response.data.createDriver) // update context with the created driver
+          navigate('/driver-home')
+        }
+      })
+      .catch((error) => {
+        navigate('/');
+        console.log('axios problem', error)
+      })
+
     setEmail('')
     setPassword('')
     setFirstName('')
     setLastName('')
+    setVehicleColor('')
+    setVehicleNumberPlate('')
+    setVehicleCapacity('')
+    setVehicleType('car')
   }
 
   return (
@@ -55,16 +93,17 @@ const DriverSignUp = () => {
                 type='text'
                 aria-label='First name'
                 autoComplete='given-name'
+                minLength={3}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder='First name'
                 className={`${inputClass} w-1/2`}
               />
               <input
-                required
                 type='text'
                 aria-label='Last name'
                 autoComplete='family-name'
+                minLength={3}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder='Last name'
@@ -79,9 +118,10 @@ const DriverSignUp = () => {
                 required
                 type='email'
                 autoComplete='email'
+                title='Use a gmail.com address'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder='email@example.com'
+                placeholder='email@gmail.com'
                 className={inputClass}
               />
             </div>
@@ -92,6 +132,7 @@ const DriverSignUp = () => {
                 required
                 type='password'
                 autoComplete='new-password'
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='password'
@@ -99,11 +140,58 @@ const DriverSignUp = () => {
               />
             </div>
 
+            <p className={labelClass}>About your vehicle</p>
+            <div className='flex gap-4 mb-6'>
+              <input
+                required
+                type='text'
+                aria-label='Vehicle color'
+                minLength={3}
+                value={vehicleColor}
+                onChange={(e) => setVehicleColor(e.target.value)}
+                placeholder='Color'
+                className={`${inputClass} w-1/2`}
+              />
+              <input
+                required
+                type='text'
+                aria-label='Number plate'
+                minLength={3}
+                value={vehicleNumberPlate}
+                onChange={(e) => setVehicleNumberPlate(e.target.value)}
+                placeholder='Number plate'
+                className={`${inputClass} w-1/2`}
+              />
+            </div>
+            <div className='flex gap-4 mb-6'>
+              <input
+                required
+                type='number'
+                aria-label='Seating capacity'
+                min={1}
+                value={vehicleCapacity}
+                onChange={(e) => setVehicleCapacity(e.target.value)}
+                placeholder='Capacity'
+                className={`${inputClass} w-1/2`}
+              />
+              <select
+                required
+                aria-label='Vehicle type'
+                value={vehicleType}
+                onChange={(e) => setVehicleType(e.target.value)}
+                className={`${inputClass} w-1/2`}
+              >
+                <option value='car'>Car</option>
+                <option value='motorcycle'>Motorcycle</option>
+                <option value='auto'>Auto</option>
+              </select>
+            </div>
+
             <button
               type='submit'
               className='bg-[#111] text-white rounded-2xl px-4 py-3 w-full text-lg font-medium hover:bg-neutral-800 active:scale-[0.99] transition'
             >
-              Signup
+              Create account
             </button>
           </form>
           <p className='text-center mt-4'>

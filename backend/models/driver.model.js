@@ -7,10 +7,10 @@ const driverSchema = new Schema({
         firstName: { type: String, required: true, minlength: [3, 'first name must be 3 character'] },
         lastName: { type: String, minlength: [3, 'last name is must be 3 character'] }
     },
-    email: { type: String, required: true, unique: true, lowercase: true, match: [/^[a-zA-Z0-9._%+-]+@gmail\.com$/] },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true, lowercase: true },
     password: { type: String, required: true, select: false, minlength: [6, 'password must be atleast 6 character'] },
     socketId: { type: String },
-    status: { type: String, required: true, enum: ['active', 'inactive'] },
+    status: { type: String, enum: ['active', 'inactive'] },
     vehical: {
         color: { type: String, required: true, minlength: [3, 'vehical color is must be 3 length word'] },
         NumberPlate: { type: String, required: true, minlength: [3, 'vehical numberPlate is must be 3 length'] },
@@ -18,8 +18,8 @@ const driverSchema = new Schema({
         vehicalType: { type: String, required: true, enum: ['car', 'motorcycle', 'auto'] }
     },
     location: {
-        lat: { type: Number, required: true },
-        lng: { type: Number, required: true }
+        lat: { type: Number },
+        lng: { type: Number }
     }
 })
 

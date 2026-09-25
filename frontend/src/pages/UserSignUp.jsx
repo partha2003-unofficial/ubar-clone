@@ -1,20 +1,26 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { UserDataContext } from '../../context/UserContext.jsx'
 
 const inputClass =
   'bg-[#eeeeee] rounded-2xl px-4 py-3 w-full text-base placeholder:text-neutral-500 outline-none ring-2 ring-transparent focus:ring-black transition-shadow'
 const labelClass = 'block text-base font-medium mb-2'
 
 const UserSignUp = () => {
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [userData, setUserData] = useState({})
 
-  function handleSubmit(e) {
+  const userNavigate = useNavigate(); //for navigate
+  const { setUser } = useContext(UserDataContext) //collect data to set the data in the global variable
+
+  async function handleSubmit(e) {
     e.preventDefault()
-    setUserData({
+
+    const newUser = ({
       fullName: {
         firstName: firstName,
         lastName: lastName
@@ -22,6 +28,17 @@ const UserSignUp = () => {
       email: email,
       password: password
     })
+
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/register`, newUser)
+      .then(({ data }) => {
+        setUser(data?.createUser)
+        localStorage.setItem('token', data.token)
+        userNavigate('/home')
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+
     setEmail('')
     setPassword('')
     setFirstName('')
@@ -103,7 +120,7 @@ const UserSignUp = () => {
               type='submit'
               className='bg-[#111] text-white rounded-2xl px-4 py-3 w-full text-lg font-medium hover:bg-neutral-800 active:scale-[0.99] transition'
             >
-              Signup
+              Create account
             </button>
           </form>
           <p className='text-center mt-4'>

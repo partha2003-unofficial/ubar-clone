@@ -1,22 +1,37 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { UserDataContext } from '../../context/UserContext.jsx'
 
 const inputClass =
   'bg-[#eeeeee] rounded-2xl px-4 py-3 w-full text-base placeholder:text-neutral-500 outline-none ring-2 ring-transparent focus:ring-black transition-shadow'
 const labelClass = 'block text-base font-medium mb-2'
 
 const UserLogin = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [userData, setUserData] = useState({})
 
-  function handleSubmit(e) {
+  const navigate = useNavigate()
+
+  const [emailid, setEmailID] = useState('')
+  const [password, setPassword] = useState('')
+
+  const { setUser } = useContext(UserDataContext)
+
+  async function handleSubmit(e) {
+
     e.preventDefault()
-    setUserData({
-      email: email,
+    const userData = ({
+      email: emailid,
       password: password
     })
-    setEmail('')
+
+    await axios.post(`${process.env.VITE_API_BASE_URL}/user/login`, userData)
+      .then(({ data }) => {
+        localStorage.setItem('token',data.token)
+        setUser(data?.userFind);
+        navigate('/home')
+      })
+
+    setEmailID('')
     setPassword('')
   }
 
@@ -47,8 +62,8 @@ const UserLogin = () => {
                 required
                 type='email'
                 autoComplete='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={emailid}
+                onChange={(e) => setEmailID(e.target.value)}
                 placeholder='email@example.com'
                 className={inputClass}
               />
