@@ -24,7 +24,7 @@ const UserLogin = () => {
       password: password
     })
 
-    await axios.post(`${process.env.VITE_API_BASE_URL}/user/login`, userData)
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/login`, userData)
       .then(({ data }) => {
         localStorage.setItem('token',data.token)
         setUser(data?.userFind);

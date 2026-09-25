@@ -9,7 +9,7 @@ const DriverProtected = ({ children }) => {
             navigate('/driver-login');
         }
     }, [token])
-    if (!token) { return null }
+    if (!token) { return null } // if the token is not found then return null
     return (
         <>
             {children}

@@ -6,7 +6,7 @@ async function registerDriver(request, response) {
     if (!errorValidation.isEmpty()) { return response.status(400).json({ message: 'enter valid required field', error: errorValidation.array() }) }
 
     try {
-        const { fullName, email, password, vehical} = request.body;
+        const { fullName, email, password, vehical } = request.body;
         if (!fullName.firstName || !email || !password || !vehical) {
             return response.status(400).json({ message: 'enter valid required fields' })
         }
@@ -43,7 +43,7 @@ async function loginDriver(request, response) {
 
     try {
         const { email, password } = request.body;
-        if (!email || !password) { response.status(400).json({ message: 'email and password are need' }) };
+        if (!email || !password) { return response.status(400).json({ message: 'email and password are need' }) };
 
         const findDriver = await driverModel.findOne({ email }).select('+password');
         const isMatchPassword = await findDriver.comparePassword(password);
@@ -51,8 +51,8 @@ async function loginDriver(request, response) {
 
         findDriver.password = undefined;
         const token = findDriver.createAuthToken();
-        response.cookie('token', token);
-        return response.status(200).json({ message: 'login successful', token, findDriver })
+        response.cookie('token', token)
+        return response.status(201).json({ message: 'login successful', token, findDriver })
 
     } catch (error) {
         response.status(500).json({ message: 'internal server error' })
