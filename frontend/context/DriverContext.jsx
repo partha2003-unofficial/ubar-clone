@@ -8,11 +8,11 @@ const DriverContext = ({ children }) => {
     const [isLoading, setIsLoading] = useState(null);
     const [error, setError] = useState(null);
 
-    const updateCaption = (captainData) => {
-        setDriver(captainData)
+    const updateDriver = (dirverData) => {
+        setDriver(dirverData)
     }
 
-    const captainData = {
+    const driverData = {
         driver,
         setDriver,
         isLoading,
@@ -23,7 +23,7 @@ const DriverContext = ({ children }) => {
     }
 
     return (
-        <DriverDataContext.Provider value={captainData}>
+        <DriverDataContext.Provider value={driverData}>
             {children}
         </DriverDataContext.Provider>
     )

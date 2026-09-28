@@ -7,13 +7,13 @@ import UserContext from '../context/UserContext.jsx'
 import DriverContext from '../context/driverContext.jsx'
 
 createRoot(document.getElementById('root')).render(
-
-  <DriverContext>
-    <UserContext>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </UserContext>
-  </DriverContext>
-
+  <StrictMode>
+    <DriverContext>
+      <UserContext>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </UserContext>
+    </DriverContext>
+  </StrictMode>
 )
