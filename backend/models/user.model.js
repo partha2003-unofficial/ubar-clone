@@ -8,7 +8,7 @@ const userSchema = new Schema({
         lastName: { type: String, minlength: [2, 'Last Name is must be atleat 2 character'] }
     },
     email: { type: String, required: true, unique: true, minlength: [5, 'email is must be 5 character'] },
-    password: { type: String, required: true, select: false, minlength: [6, 'password is must be 5 character'] },
+    password: { type: String, required: true, select: false, minlength: [6, 'password is must be 6 character'] },
     socketId: { type: String }
 }, { timestamps: true })
 

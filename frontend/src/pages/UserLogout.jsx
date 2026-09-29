@@ -9,7 +9,6 @@ const UserLogout = () => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    console.log(token)
     if (!token) {
       navigate('/logout')
       return

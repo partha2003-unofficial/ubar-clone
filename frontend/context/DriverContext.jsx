@@ -19,7 +19,7 @@ const DriverContext = ({ children }) => {
         setIsLoading,
         error,
         setError,
-        updateCaption
+        updateDriver
     }
 
     return (

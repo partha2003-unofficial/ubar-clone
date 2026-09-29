@@ -35,12 +35,8 @@ const DriverProtected = ({ children }) => {
             })
     }, [token])
 
-    if (!token) { return null } // if the token is not found on not chenge the token 
-    console.log(lodding)
-
-    if (lodding) {
-        return (<div>Loadding..</div>)
-    }
+    if (!token) { return null } // if the token is not found on not chenge the token
+    if (lodding) { return (<div>Loadding..</div>) }
 
     return (
         <>
