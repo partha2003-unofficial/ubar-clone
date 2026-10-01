@@ -10,12 +10,14 @@ import UserProtected from '../components/UserProtected.jsx'
 import UserLogout from './pages/UserLogout.jsx'
 import DriverProtected from '../components/DriverProtected.jsx'
 import DriverHome from './pages/DriverHome.jsx'
+import Riding from './pages/Riding.jsx'
 
 function App() {
   return (
     <div>
       <Routes>
         <Route path='/' element={<Start />} />
+        <Route path='/riding' element={<Riding />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/driver-login' element={<Driverlogin />} />

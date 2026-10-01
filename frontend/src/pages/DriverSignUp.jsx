@@ -4,8 +4,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { DriverDataContext } from '../../context/driverContext'
 
 const inputClass =
-  'bg-[#eeeeee] rounded-2xl px-4 py-3 w-full text-base placeholder:text-neutral-500 outline-none ring-2 ring-transparent focus:ring-black transition-shadow'
-const labelClass = 'block text-base font-medium mb-2'
+  'w-full rounded-xl border border-neutral-300 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none transition-all duration-200 focus:border-black focus:ring-2 focus:ring-black/10'
+
+const labelClass =
+  'mb-2 block text-sm font-medium text-neutral-800'
 
 const DriverSignUp = () => {
 
@@ -47,7 +49,7 @@ const DriverSignUp = () => {
       .then((response) => {
         if (response.status === 201) {
           localStorage.setItem('token', response.data.token)
-          setDriver(response.data.createDriver) // update context with the created driver
+          setDriver(response.data.createDriver)
           navigate('/driver-home')
         }
       })
@@ -67,27 +69,117 @@ const DriverSignUp = () => {
   }
 
   return (
-    <div className='min-h-screen lg:grid lg:grid-cols-2'>
-      {/* Photo panel: desktop only */}
-      <aside className='relative hidden lg:block bg-cover bg-center bg-[url(https://i.pinimg.com/736x/00/7e/95/007e95423e1fad5833bf80d35e5cc92a.jpg)]'>
-        <div className='absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-transparent' />
-        <p className='absolute bottom-14 left-14 right-14 max-w-md text-white text-4xl xl:text-5xl font-semibold tracking-tight leading-[1.05]'>
-          Your car, your hours, your earnings.
-        </p>
-      </aside>
+    <div className='min-h-screen bg-white lg:h-screen lg:overflow-hidden lg:grid lg:grid-cols-2'>
 
-      <main className='flex min-h-screen flex-col justify-between p-8 lg:px-14 lg:py-10'>
-        <div className='w-full max-w-md lg:mx-auto lg:my-auto'>
+      {/* =====================================================
+          LEFT — DRIVER IMAGE PANEL
+      ====================================================== */}
+      <aside
+        className='relative hidden h-screen overflow-hidden bg-cover bg-center lg:block'
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1600&q=85')"
+        }}
+      >
+
+        {/* Dark overlay */}
+        <div className='absolute inset-0 bg-black/45' />
+
+        {/* Gradient */}
+        <div className='absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent' />
+
+        {/* Uber logo */}
+        <div className='absolute left-12 top-10'>
           <img
-            className='w-20 mb-10 lg:mb-12'
-            src='https://static.vecteezy.com/system/resources/previews/027/127/451/non_2x/uber-logo-uber-icon-transparent-free-png.png'
+            className='w-24 brightness-0 invert'
+            src='https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png'
             alt='Uber'
           />
-          <h1 className='hidden lg:block text-3xl font-semibold tracking-tight mb-8'>Sign up to drive</h1>
+        </div>
+
+        {/* Main message */}
+        <div className='absolute bottom-14 left-12 right-12 max-w-xl text-white'>
+
+          <p className='mb-5 text-sm font-medium uppercase tracking-[0.25em] text-white/70'>
+            Drive with Uber
+          </p>
+
+          <h2 className='text-4xl font-semibold leading-[1.08] tracking-tight xl:text-6xl'>
+            Your car.
+            <br />
+            Your hours.
+            <br />
+            Your earnings.
+          </h2>
+
+          <p className='mt-6 max-w-lg text-base leading-7 text-white/75 xl:text-lg'>
+            Join thousands of drivers earning on their own schedule.
+          </p>
+
+        </div>
+      </aside>
+
+
+      {/* =====================================================
+          RIGHT — SIGNUP FORM
+      ====================================================== */}
+      <main className='flex min-h-screen flex-col bg-[#f7f7f7] px-5 py-6 sm:px-8 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:bg-white lg:px-14 lg:py-8'>
+
+        {/* Mobile header */}
+        <div className='mb-8 flex items-center justify-between lg:hidden'>
+
+          <img
+            className='w-20'
+            src='https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png'
+            alt='Uber'
+          />
+
+          <span className='rounded-full bg-black px-3 py-1.5 text-xs font-medium text-white'>
+            Driver
+          </span>
+
+        </div>
+
+
+        {/* Form scroll area */}
+        <div className='w-full max-w-md lg:mx-auto lg:my-auto lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto lg:pr-2'>
+
+          {/* Desktop logo */}
+          <img
+            className='mb-7 hidden w-20 lg:block'
+            src='https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png'
+            alt='Uber'
+          />
+
+          {/* Heading */}
+          <div className='mb-7'>
+
+            <p className='mb-2 text-sm font-medium text-neutral-500 lg:hidden'>
+              Become an Uber driver
+            </p>
+
+            <h1 className='text-3xl font-semibold tracking-tight text-neutral-950 sm:text-4xl lg:text-3xl'>
+              Sign up to drive
+            </h1>
+
+            <p className='mt-2 text-sm leading-6 text-neutral-500'>
+              Create your driver account and start earning.
+            </p>
+
+          </div>
+
 
           <form onSubmit={handleSubmit}>
-            <p className={labelClass}>What's your name</p>
-            <div className='flex gap-4 mb-6'>
+
+            {/* =================================================
+                NAME
+            ================================================== */}
+            <p className={labelClass}>
+              What's your name
+            </p>
+
+            <div className='mb-5 flex gap-3 sm:gap-4'>
+
               <input
                 required
                 type='text'
@@ -97,8 +189,9 @@ const DriverSignUp = () => {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder='First name'
-                className={`${inputClass} w-1/2`}
+                className={inputClass}
               />
+
               <input
                 type='text'
                 aria-label='Last name'
@@ -107,12 +200,24 @@ const DriverSignUp = () => {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder='Last name'
-                className={`${inputClass} w-1/2`}
+                className={inputClass}
               />
+
             </div>
 
-            <div className='mb-6'>
-              <label htmlFor='email' className={labelClass}>What's your email</label>
+
+            {/* =================================================
+                EMAIL
+            ================================================== */}
+            <div className='mb-5'>
+
+              <label
+                htmlFor='email'
+                className={labelClass}
+              >
+                What's your email
+              </label>
+
               <input
                 id='email'
                 required
@@ -124,9 +229,22 @@ const DriverSignUp = () => {
                 placeholder='email@gmail.com'
                 className={inputClass}
               />
+
             </div>
+
+
+            {/* =================================================
+                PASSWORD
+            ================================================== */}
             <div className='mb-6'>
-              <label htmlFor='password' className={labelClass}>Enter password</label>
+
+              <label
+                htmlFor='password'
+                className={labelClass}
+              >
+                Enter password
+              </label>
+
               <input
                 id='password'
                 required
@@ -135,13 +253,32 @@ const DriverSignUp = () => {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder='password'
+                placeholder='Password'
                 className={inputClass}
               />
+
             </div>
 
-            <p className={labelClass}>About your vehicle</p>
-            <div className='flex gap-4 mb-6'>
+
+            {/* =================================================
+                VEHICLE DETAILS
+            ================================================== */}
+            <div className='mb-4 border-t border-neutral-200 pt-6'>
+
+              <p className='mb-1 text-base font-semibold text-neutral-950'>
+                Vehicle details
+              </p>
+
+              <p className='mb-5 text-sm text-neutral-500'>
+                Tell us about the vehicle you'll drive.
+              </p>
+
+            </div>
+
+
+            {/* Color + Number plate */}
+            <div className='mb-5 flex gap-3 sm:gap-4'>
+
               <input
                 required
                 type='text'
@@ -150,8 +287,9 @@ const DriverSignUp = () => {
                 value={vehicleColor}
                 onChange={(e) => setVehicleColor(e.target.value)}
                 placeholder='Color'
-                className={`${inputClass} w-1/2`}
+                className={inputClass}
               />
+
               <input
                 required
                 type='text'
@@ -160,10 +298,15 @@ const DriverSignUp = () => {
                 value={vehicleNumberPlate}
                 onChange={(e) => setVehicleNumberPlate(e.target.value)}
                 placeholder='Number plate'
-                className={`${inputClass} w-1/2`}
+                className={inputClass}
               />
+
             </div>
-            <div className='flex gap-4 mb-6'>
+
+
+            {/* Capacity + Vehicle type */}
+            <div className='mb-6 flex gap-3 sm:gap-4'>
+
               <input
                 required
                 type='number'
@@ -172,38 +315,67 @@ const DriverSignUp = () => {
                 value={vehicleCapacity}
                 onChange={(e) => setVehicleCapacity(e.target.value)}
                 placeholder='Capacity'
-                className={`${inputClass} w-1/2`}
+                className={inputClass}
               />
+
               <select
                 required
                 aria-label='Vehicle type'
                 value={vehicleType}
                 onChange={(e) => setVehicleType(e.target.value)}
-                className={`${inputClass} w-1/2`}
+                className={inputClass}
               >
                 <option value='car'>Car</option>
                 <option value='motorcycle'>Motorcycle</option>
                 <option value='auto'>Auto</option>
               </select>
+
             </div>
 
+
+            {/* =================================================
+                CREATE ACCOUNT
+            ================================================== */}
             <button
               type='submit'
-              className='bg-[#111] text-white rounded-2xl px-4 py-3 w-full text-lg font-medium hover:bg-neutral-800 active:scale-[0.99] transition'
+              className='w-full rounded-xl bg-black px-5 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 hover:shadow-md active:scale-[0.985] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2'
             >
               Create account
             </button>
+
           </form>
-          <p className='text-center mt-4'>
+
+
+          {/* Login */}
+          <p className='mt-5 text-center text-sm text-neutral-600'>
+
             Already have an account?{' '}
-            <Link to='/driver-login' className='text-blue-700 hover:underline'>Login here</Link>
+
+            <Link
+              to='/driver-login'
+              className='font-semibold text-black underline decoration-neutral-400 underline-offset-4 transition hover:decoration-black'
+            >
+              Login here
+            </Link>
+
           </p>
+
         </div>
 
-        <p className='w-full max-w-md lg:mx-auto text-[10px] leading-tight text-neutral-600 lg:text-xs'>
-          Terms & Conditions: By using this website, you agree to comply with these Terms & Conditions. This website is intended to provide ride-booking and transportation-related services.
+
+        {/* =====================================================
+            TERMS
+        ====================================================== */}
+        <p className='mx-auto mt-6 w-full max-w-md text-center text-[10px] leading-4 text-neutral-400 sm:text-xs lg:mt-4'>
+
+          By creating an account, you agree to Uber's terms and
+          privacy policy. This website provides ride-booking and
+          transportation-related services.
+
         </p>
+
       </main>
+
     </div>
   )
 }
